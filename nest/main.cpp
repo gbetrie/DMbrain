@@ -29,6 +29,8 @@
 // Includes from sli:
 #include "interpret.h"
 
+#include "petsc.h"
+
 int
 main( int argc, char* argv[] )
 {
@@ -40,10 +42,11 @@ main( int argc, char* argv[] )
   SLIInterpreter engine;
 
   neststartup( &argc, &argv, engine );
-
+  PetscInitialize(&argc,&argv,NULL,NULL);
   // start the interpreter session
   int exitcode = engine.execute();
 
+  PetscFinalize();
   nestshutdown( exitcode );
 
   return exitcode;
