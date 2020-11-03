@@ -64,11 +64,12 @@ if ( NOT SIONLIB_CONFIG STREQUAL "SIONLIB_CONFIG-NOTFOUND" )
   elseif ( MPI_CXX_FOUND )
     set( CONF_FLAGS ${CONF_FLAGS} "--mpi" )
   endif ()
-
+  set( CONF_FLAGS ${CONF_FLAGS} "--64" )
+  
   # what compiler?
-  if ( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
-    set( CONF_FLAGS ${CONF_FLAGS} "--gcc" )
-  endif ()
+  #if ( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
+  #  set( CONF_FLAGS ${CONF_FLAGS} "--gcc" )
+  #endif ()
 
 
   # use sionconfig to get --cflags
@@ -101,7 +102,9 @@ if ( NOT SIONLIB_CONFIG STREQUAL "SIONLIB_CONFIG-NOTFOUND" )
       OUTPUT_VARIABLE SIONLIB_LIBS_OUTPUT
       OUTPUT_STRIP_TRAILING_WHITESPACE
       )
-  if ( RESULT EQUAL 0 )
+    message(STATUS "Result fromm sionconfig --libs" ${RESULT})
+    message(STATUS "Output fromm sionconfig --libs" ${SIONLIB_LIBS_OUTPUT})
+    if ( RESULT EQUAL 0 )
     set( SIONLIB_LIBRARIES "" CACHE INTERNAL "sionlib" )
     # make list
     string( REPLACE " " ";" LIBS ${SIONLIB_LIBS_OUTPUT} )
