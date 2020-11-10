@@ -1,3 +1,4 @@
+
 # cmake/ProcessOptions.cmake
 #
 # This file is part of NEST.
@@ -520,7 +521,10 @@ function( NEST_PROCESS_WITH_LIBNEUROSIM )
       set( LIBNEUROSIM_ROOT ${with-libneurosim} )
     endif ()
 
-    find_package( LibNeurosim )
+    message(STATUS "root $(LIBNEUROSIM_ROOT}")
+      find_package( LibNeurosim )
+  message(STATUS "fond ${LIBNEUROSIM_FOUND}")
+      
     if ( LIBNEUROSIM_FOUND )
       set( HAVE_LIBNEUROSIM ON PARENT_SCOPE )
 

@@ -62,6 +62,8 @@
 #include <gnureadline.h>
 #endif
 
+#include <petsc.h>
+
 SLIInterpreter* sli_engine;
 
 SLIInterpreter&
@@ -85,6 +87,7 @@ neststartup( int* argc, char*** argv, SLIInterpreter& engine, std::string module
 #endif
 {
   nest::init_nest( argc, argv );
+  PetscInitialize(argc,argv,NULL,NULL);
 
   sli_engine = &engine;
   register_logger_client( sli_logging );
@@ -174,6 +177,7 @@ neststartup( int* argc, char*** argv, SLIInterpreter& engine, std::string module
 void
 nestshutdown( int exitcode )
 {
+  PetscFinalize();
   nest::kernel().finalize();
   nest::kernel().mpi_manager.mpi_finalize( exitcode );
   nest::KernelManager::destroy_kernel_manager();

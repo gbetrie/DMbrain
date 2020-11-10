@@ -35,6 +35,8 @@
 #include "sliexceptions.h"
 #include "token.h"
 
+#include "petsc.h"
+
 namespace nest
 {
 
@@ -172,6 +174,8 @@ create( const Name& model_name, const index n_nodes )
 
   // create
   const index model_id = static_cast< index >( model );
+
+  PetscInfo2(NULL,"Creating model %s id %d\n",model_name.toString().c_str(),(int)model_id);
 
   return kernel().node_manager.add_node( model_id, n_nodes );
 }
