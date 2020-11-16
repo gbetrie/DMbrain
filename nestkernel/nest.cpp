@@ -36,6 +36,7 @@
 #include "token.h"
 
 #include "petsc.h"
+PetscInt PetscTotalNodes = 0;
 
 namespace nest
 {
@@ -177,7 +178,22 @@ create( const Name& model_name, const index n_nodes )
 
   PetscInfo2(NULL,"Creating model %s id %d\n",model_name.toString().c_str(),(int)model_id);
 
-  return kernel().node_manager.add_node( model_id, n_nodes );
+  NodeCollectionPTR nc = kernel().node_manager.add_node( model_id, n_nodes );
+  size_t Nnc = nc->size();
+  PetscInfo1(NULL,"Number of nodes in collection %d\n",(int)Nnc);
+  for (size_t i=0; i<Nnc; i++) {
+    index node_id = (*nc)[i];
+    PetscInfo1(NULL,"  Node id %d\n",(int)node_id);    
+  }
+  PetscTotalNodes += Nnc;
+
+
+  //nc->print_me(std::cout);
+  //ArrayDatum anc = nc->to_array();
+
+
+
+  return nc;
 }
 
 NodeCollectionPTR

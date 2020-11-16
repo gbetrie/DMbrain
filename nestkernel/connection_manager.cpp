@@ -477,7 +477,8 @@ nest::ConnectionManager::connect( const index snode_id,
 
   ConnectionType connection_type = connection_required( source, target, target_thread );
 
-  PetscInfo5(NULL,"Source %s id %d Target  %s id %d Synapse Id %d\n",source->get_name().c_str(),(int)source->get_node_id(),target->get_name().c_str(),(int)target->get_node_id(),(int)syn_id);
+  PetscInfo5(NULL,"Source %s Node id %d Target  %s Node id %d Synapse Id %d\n",source->get_name().c_str(),(int)source->get_node_id(),target->get_name().c_str(),(int)target->get_node_id(),(int)syn_id);
+  
   switch ( connection_type )
   {
   case CONNECT:

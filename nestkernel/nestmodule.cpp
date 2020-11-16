@@ -63,6 +63,10 @@
 #include "stringdatum.h"
 #include "tokenutils.h"
 
+#include "petsc.h"
+#include "petscdmnetwork.h"
+extern PetscInt PetscTotalNodes,PetscTotalEdges;
+
 namespace nest
 {
 SLIType NestModule::ConnectionType;
@@ -681,6 +685,17 @@ NestModule::SimulateFunction::execute( SLIInterpreter* i ) const
 
   const double time = i->OStack.top();
 
+  PetscInfo2(NULL,"Starting simulation Nodes %D Edges %D\n",PetscTotalNodes,PetscTotalEdges);
+  DM dm; DMNetworkCreate(PETSC_COMM_WORLD,&dm);
+  DMNetworkSetSizes(dm,1,&PetscTotalNodes,&PetscTotalEdges,0,NULL);
+  PetscInt zero[] = {0};
+  DMNetworkSetEdgeList(dm,(PetscInt**)&zero,NULL);
+  //DMNetworkRegisterComponent(dm,...); 
+  //DMNetworkLayoutSetUp(dm);
+  DMSetFromOptions(dm);
+  //DMSetUp(dm);
+  //DMView(dm,NULL);
+  DMDestroy(&dm);
   simulate( time );
 
   // successful end of simulate

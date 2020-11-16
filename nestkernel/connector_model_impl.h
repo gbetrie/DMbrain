@@ -40,6 +40,9 @@
 
 // Includes from sli:
 #include "dictutils.h"
+#include "petsc.h"
+
+PetscInt PetscTotalEdges = 0;
 
 namespace nest
 {
@@ -249,6 +252,8 @@ GenericConnectorModel< ConnectionT >::add_connection( Node& src,
   updateValue< long >( p, names::receptor_type, actual_receptor_type );
 
   add_connection_( src, tgt, thread_local_connectors, syn_id, connection, actual_receptor_type );
+  PetscInfo3(NULL,"Connecting Node id %d to Node id %d with Connection syn id %d\n",(int) src.get_node_id(),(int) tgt.get_node_id(),(int)connection.get_syn_id());
+  PetscTotalEdges++;
 }
 
 
