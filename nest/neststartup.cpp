@@ -87,7 +87,6 @@ neststartup( int* argc, char*** argv, SLIInterpreter& engine, std::string module
 #endif
 {
   nest::init_nest( argc, argv );
-  PetscInitialize(argc,argv,NULL,NULL);
 
   sli_engine = &engine;
   register_logger_client( sli_logging );
@@ -170,7 +169,7 @@ neststartup( int* argc, char*** argv, SLIInterpreter& engine, std::string module
   assert( ad != NULL );
   ad->push_back( new StringDatum( "(" + modulepath + "/pynest-init.sli) run" ) );
 #endif
-
+  PetscInitialize(argc,argv,NULL,NULL);
   return engine.startup();
 }
 
