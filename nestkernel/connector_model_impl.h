@@ -42,7 +42,8 @@
 #include "dictutils.h"
 #include "petsc.h"
 
-PetscInt PetscTotalEdges = 0;
+#define MAX_EDGES 1000  // TODO: replace with dynamic array 
+PetscInt PetscTotalEdges = 0,**PetscEdges = NULL;
 
 namespace nest
 {
@@ -253,6 +254,12 @@ GenericConnectorModel< ConnectionT >::add_connection( Node& src,
 
   add_connection_( src, tgt, thread_local_connectors, syn_id, connection, actual_receptor_type );
   PetscInfo3(NULL,"Connecting Node id %d to Node id %d with Connection syn id %d\n",(int) src.get_node_id(),(int) tgt.get_node_id(),(int)connection.get_syn_id());
+  if (!PetscEdges) {
+    PetscMalloc1(1,&PetscEdges);
+    PetscMalloc1(MAX_EDGES,&PetscEdges[0]);
+  }
+  PetscEdges[0][2*PetscTotalEdges] = (int) src.get_node_id();
+  PetscEdges[0][2*PetscTotalEdges+1] = (int) tgt.get_node_id();  
   PetscTotalEdges++;
 }
 

@@ -65,8 +65,14 @@
 
 #include "petsc.h"
 #include "petscdmnetwork.h"
-extern PetscInt PetscTotalNodes,PetscTotalEdges;
+extern PetscInt PetscTotalNodes,PetscTotalEdges,**PetscEdges;
 
+// For now we represent all Nest models with the same struct for DMNetworkRegisterComponent()
+// Later we may have a different component for each Nest model
+typedef struct {
+  void *componentNestData;
+} _n_DMNestComponent;
+  
 namespace nest
 {
 SLIType NestModule::ConnectionType;
@@ -685,17 +691,47 @@ NestModule::SimulateFunction::execute( SLIInterpreter* i ) const
 
   const double time = i->OStack.top();
 
-  PetscInfo2(NULL,"Starting simulation Nodes %D Edges %D\n",PetscTotalNodes,PetscTotalEdges);
+  PetscInfo2(NULL,"Create DMNetwork Nodes %D Edges %D\n",PetscTotalNodes,PetscTotalEdges);
   DM dm; DMNetworkCreate(PETSC_COMM_WORLD,&dm);
   DMNetworkSetSizes(dm,1,&PetscTotalNodes,&PetscTotalEdges,0,NULL);
-  PetscInt zero[] = {0};
-  DMNetworkSetEdgeList(dm,(PetscInt**)&zero,NULL);
-  //DMNetworkRegisterComponent(dm,...); 
-  //DMNetworkLayoutSetUp(dm);
+
+  // Nest starts counts at 1, PETSc at 0
+  for (PetscInt i=0;i<PetscTotalEdges;i++) {PetscEdges[0][2*i]--;PetscEdges[0][2*i+1]--;}
+  DMNetworkSetEdgeList(dm,PetscEdges,NULL);
+
+  PetscInt componentkey;
+  DMNetworkRegisterComponent(dm,"DMNestComponent",sizeof(_n_DMNestComponent),&componentkey);
+  DMNetworkLayoutSetUp(dm);
   DMSetFromOptions(dm);
-  //DMSetUp(dm);
-  //DMView(dm,NULL);
+  DMView(dm,NULL);
+
+  _n_DMNestComponent nestcomponent;
+  // TODO set the number of veriables correctly
+  
+  PetscInt eStart,eEnd;
+  DMNetworkGetEdgeRange(dm,&eStart,&eEnd);
+  for (PetscInt e = eStart; e < eEnd; e++) {
+    /* Add component to each edge */
+    DMNetworkAddComponent(dm,e,componentkey,&nestcomponent);
+
+    /* Add number of variables to each edge */
+    DMNetworkAddNumVariables(dm,e,2);
+  }
+
+  PetscInt vStart,vEnd;
+  DMNetworkGetVertexRange(dm,&vStart,&vEnd);
+  for (PetscInt v = vStart; v < vEnd; v++) {
+    /* Add component to each vertex */
+    DMNetworkAddComponent(dm,v,componentkey,&nestcomponent);
+
+    /* Add number of variables to each edge */
+    DMNetworkAddNumVariables(dm,v,2);
+  }
+  
+  DMSetUp(dm);
+  DMView(dm,NULL);
   DMDestroy(&dm);
+  
   simulate( time );
 
   // successful end of simulate
